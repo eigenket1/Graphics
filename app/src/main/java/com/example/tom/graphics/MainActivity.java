@@ -21,149 +21,174 @@ public class MainActivity extends Activity {
     MyView myView;
     final long mInterval = 10;
     Handler mHandler = new Handler();
+    Runnable run;
 
     public static ArrayList<int[]> lines = new ArrayList<int[]>();
     public static ArrayList<double[]> points = new ArrayList<double[]>();
     public static ArrayList<double[]> initialPoints = null;
 
     public void translateLeft(View v){
-        Matrices.applyToTNet(Matrices.TRANSLATELEFT);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        Matrices.translate(-75/MyView.scale,0,0);
+        Matrices.transform();
     }
 
     public void translateRight(View v){
-        Matrices.applyToTNet(Matrices.TRANSLATERIGHT);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        Matrices.translate(75/MyView.scale,0,0);
+        Matrices.transform();
     }
 
     public void translateUp(View v){
-        Matrices.applyToTNet(Matrices.TRANSLATEUP);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        Matrices.translate(0,35/MyView.scale,0);
+        Matrices.transform();
     }
 
     public void translateDown(View v){
-        Matrices.applyToTNet(Matrices.TRANSLATEDOWN);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        Matrices.translate(0,-35/MyView.scale,0);
+        Matrices.transform();
     }
 
     public void zoomIn(View v){
-        Matrices.ZOOMIN[3][0] = -points.get(0)[0]/10;
-        Matrices.ZOOMIN[3][1] = -points.get(0)[1]/10;
-        Matrices.ZOOMIN[3][2] = -points.get(0)[2]/10;
-        Matrices.applyToTNet(Matrices.ZOOMIN);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double x = points.get(0)[0];
+        double y = points.get(0)[1];
+        double z = points.get(0)[2];
+        Matrices.translate(-x, -y, -z);
+        Matrices.scale(1.1);
+        Matrices.translate(x, y, z);
+        Matrices.transform();
     }
 
     public void zoomOut(View v){
-        Matrices.ZOOMOUT[3][0] = points.get(0)[0]/10;
-        Matrices.ZOOMOUT[3][1] = points.get(0)[1]/10;
-        Matrices.ZOOMOUT[3][2] = points.get(0)[2]/10;
-        Matrices.applyToTNet(Matrices.ZOOMOUT);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double x = points.get(0)[0];
+        double y = points.get(0)[1];
+        double z = points.get(0)[2];
+        Matrices.translate(-x, -y, -z);
+        Matrices.scale(0.9);
+        Matrices.translate(x, y, z);
+        Matrices.transform();
     }
 
     public void rotateX(View v){
-        Matrices.ROTATEX[3][1] = -points.get(0)[1]*(Matrices.COS-1)-
-                -points.get(0)[2]*Matrices.SIN;
-        Matrices.ROTATEX[3][2] = -points.get(0)[1]*(Matrices.SIN)+
-                -points.get(0)[2]*(Matrices.COS-1);
-        Matrices.applyToTNet(Matrices.ROTATEX);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double x = points.get(0)[0];
+        double y = points.get(0)[1];
+        double z = points.get(0)[2];
+        Matrices.translate(-x, -y, -z);
+        Matrices.rotate(1, 2, 0.05);
+        Matrices.translate(x, y, z);
+        Matrices.transform();
     }
 
     public void rotateY(View v){
-        Matrices.ROTATEY[3][0] = -points.get(0)[0]*(Matrices.COS-1)-
-                -points.get(0)[2]*Matrices.SIN;
-        Matrices.ROTATEY[3][2] = -points.get(0)[0]*(Matrices.SIN)+
-                -points.get(0)[2]*(Matrices.COS-1);
-        Matrices.applyToTNet(Matrices.ROTATEY);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double x = points.get(0)[0];
+        double y = points.get(0)[1];
+        double z = points.get(0)[2];
+        Matrices.translate(-x, -y, -z);
+        Matrices.rotate(0, 2, 0.05);
+        Matrices.translate(x, y, z);
+        Matrices.transform();
     }
 
     public void rotateZ(View v){
-        Matrices.ROTATEZ[3][0] =- points.get(0)[0]*(Matrices.COS-1)-
-                -points.get(0)[1]*Matrices.SIN;
-        Matrices.ROTATEZ[3][1] = -points.get(0)[0]*(Matrices.SIN)+
-                -points.get(0)[1]*(Matrices.COS-1);
-        Matrices.applyToTNet(Matrices.ROTATEZ);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double x = points.get(0)[0];
+        double y = points.get(0)[1];
+        double z = points.get(0)[2];
+        Matrices.translate(-x, -y, -z);
+        Matrices.rotate(0, 1, 0.05);
+        Matrices.translate(x, y, z);
+        Matrices.transform();
     }
 
     public void shearLeft(View v){
-        Matrices.SHEARLEFT[3][0]= (initialPoints.get(0)[1]*Matrices.TNet[1][1]-points.get(0)[1])*-0.1;
-        Matrices.applyToTNet(Matrices.SHEARLEFT);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double offset = initialPoints.get(0)[1]*Matrices.TNet[1][1]-points.get(0)[1];
+        Matrices.translate(0, offset, 0);
+        Matrices.shear(-0.1);
+        Matrices.translate(0, -offset, 0);
+        Matrices.transform();
     }
 
     public void shearRight(View v){
-        Matrices.SHEARRIGHT[3][0]= (initialPoints.get(0)[1]*Matrices.TNet[1][1]-points.get(0)[1])*0.1;
-        Matrices.applyToTNet(Matrices.SHEARRIGHT);
-        myView.invalidate();
+        mHandler.removeCallbacks(run);
+        double offset = initialPoints.get(0)[1]*Matrices.TNet[1][1]-points.get(0)[1];
+        Matrices.translate(0, offset, 0);
+        Matrices.shear(0.1);
+        Matrices.translate(0, -offset, 0);
+        Matrices.transform();
     }
 
-    boolean Xon = false;
     public void spinX(View v){
-        if(!Xon) {
-            Xrun.run();
-        }else{
-            mHandler.removeCallbacks(Xrun);
-        }
-        Xon = !Xon;
+        mHandler.removeCallbacks(run);
+
+        run = new Runnable() {
+            @Override
+            public void run() {
+                double x = points.get(0)[0];
+                double y = points.get(0)[1];
+                double z = points.get(0)[2];
+                Matrices.translate(-x, -y, -z);
+                Matrices.rotate(1, 2, 0.05);
+                Matrices.translate(x, y, z);
+                Matrices.transform();
+                mHandler.postDelayed(run, mInterval);
+            }
+        };
+
+        run.run();
     }
 
-    Runnable Xrun = new Runnable() {
-        @Override
-        public void run() {
-            rotateX(myView);
-            mHandler.postDelayed(Xrun, mInterval);
-        }
-    };
-
-    boolean Yon = false;
     public void spinY(View v){
-        if(!Yon) {
-            Yrun.run();
-        }else{
-            mHandler.removeCallbacks(Yrun);
-        }
-        Yon = !Yon;
+        mHandler.removeCallbacks(run);
+
+        run = new Runnable() {
+            @Override
+            public void run() {
+                double x = points.get(0)[0];
+                double y = points.get(0)[1];
+                double z = points.get(0)[2];
+                Matrices.translate(-x, -y, -z);
+                Matrices.rotate(0, 2, 0.05);
+                Matrices.translate(x, y, z);
+                Matrices.transform();
+                mHandler.postDelayed(run, mInterval);
+            }
+        };
+
+        run.run();
     }
 
-    Runnable Yrun = new Runnable() {
-        @Override
-        public void run() {
-            rotateY(myView);
-            mHandler.postDelayed(Yrun, mInterval);
-        }
-    };
-
-    boolean Zon = false;
     public void spinZ(View v){
-        if(!Zon) {
-            Zrun.run();
-        }else{
-            mHandler.removeCallbacks(Zrun);
-        }
-        Zon = !Zon;
+        mHandler.removeCallbacks(run);
+
+        run = new Runnable() {
+            @Override
+            public void run() {
+                double x = points.get(0)[0];
+                double y = points.get(0)[1];
+                double z = points.get(0)[2];
+                Matrices.translate(-x, -y, -z);
+                Matrices.rotate(0, 1, 0.05);
+                Matrices.translate(x, y, z);
+                Matrices.transform();
+                mHandler.postDelayed(run, mInterval);
+            }
+        };
+
+        run.run();
     }
 
-    Runnable Zrun = new Runnable() {
-        @Override
-        public void run() {
-            rotateZ(myView);
-            mHandler.postDelayed(Zrun, mInterval);
-        }
-    };
 
     public void reset(View v){
-        mHandler.removeCallbacks(Xrun);
-        mHandler.removeCallbacks(Yrun);
-        mHandler.removeCallbacks(Zrun);
-        Xon = false;
-        Yon = false;
-        Zon = false;
+        mHandler.removeCallbacks(run);
         Matrices.TNet = Matrices.IDENTITY;
-        myView.invalidate();
+        Matrices.transform();
     }
 
     @Override
@@ -171,7 +196,27 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        myView = (com.example.tom.graphics.MyView) findViewById(R.id.View);
+        Matrices.myView = (com.example.tom.graphics.MyView) findViewById(R.id.View);
+
+        int ok[] = new int [] {1,2};
+        int ok1[] = new int [] {2,3};
+        int ok2[] = new int [] {3,4};
+        int ok3[] = new int [] {4,1};
+        lines.add(ok);
+        lines.add(ok1);
+        lines.add(ok2);
+        lines.add(ok3);
+        double ok4[] = new double [] {5,5,0};
+        double ok5[] = new double [] {0,0,0};
+        double ok6[] = new double [] {0,10,0};
+        double ok7[] = new double [] {10,10,0};
+        double ok8[] = new double [] {10,0,0};
+        points.add(ok4);
+        points.add(ok5);
+        points.add(ok6);
+        points.add(ok7);
+        points.add(ok8);
+        initialPoints = points;
 
         if(initialPoints == null) {
             File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/lines.txt");
@@ -202,7 +247,7 @@ public class MainActivity extends Activity {
                     point[2] = Double.parseDouble(tok.nextToken());
                     points.add(point);
                 }
-                initialPoints = (ArrayList<double[]>)points.clone();
+                initialPoints = points;
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block

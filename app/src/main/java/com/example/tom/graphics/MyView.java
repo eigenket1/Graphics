@@ -14,13 +14,12 @@ import android.view.View;
 class MyView extends View {
 
     private Paint brush;
-
+    public static double scale;
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Matrices.transform();
 
-        double scale = getHeight()/4/MainActivity.initialPoints.get(0)[1];
+        scale = getHeight()/4/MainActivity.initialPoints.get(0)[1];
         double xShift = getWidth()/2 - MainActivity.initialPoints.get(0)[0]*scale ;
         double yShift = getHeight()/2 - MainActivity.initialPoints.get(0)[1]*-scale;
 

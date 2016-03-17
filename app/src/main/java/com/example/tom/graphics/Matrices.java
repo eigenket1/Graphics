@@ -1,88 +1,81 @@
 package com.example.tom.graphics;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 /**
  * Created by Tom on 2016-03-12.
  */
 public class Matrices {
-    final static double COS = Math.cos(0.05);
-    final static double SIN = Math.sin(0.05);
 
     public static double TNet[][] = new double[][]{                 {   1,   0,   0,   0},
                                                                     {   0,   1,   0,   0},
                                                                     {   0,   0,   1,   0},
                                                                     {   0,   0,   0,   1}};
 
-    public static double IDENTITY[][] = new double[][]{       {   1,   0,   0,   0},
+    public static double IDENTITY[][] = new double[][]{             {   1,   0,   0,   0},
                                                                     {   0,   1,   0,   0},
                                                                     {   0,   0,   1,   0},
                                                                     {   0,   0,   0,   1}};
 
-    public static double TRANSLATELEFT[][] = new double[][]{  {   1,   0,   0,   0},
+    public static double BASE[][]  = new double[][]{                {   1,   0,   0,   0},
                                                                     {   0,   1,   0,   0},
                                                                     {   0,   0,   1,   0},
-                                                                    {-7.5,   0,   0,   1}};
-
-    public static double TRANSLATERIGHT[][] = new double[][]{ {   1,   0,   0,   0},
-                                                                    {   0,   1,   0,   0},
-                                                                    {   0,   0,   1,   0},
-                                                                    { 7.5,   0,   0,   1}};
-
-    public static double TRANSLATEUP[][] = new double[][]{    {   1,   0,   0,   0},
-                                                                    {   0,   1,   0,   0},
-                                                                    {   0,   0,   1,   0},
-                                                                    {   0, 3.5,   0,   1}};
-
-    public static double TRANSLATEDOWN[][] = new double[][]{  {   1,   0,   0,   0},
-                                                                    {   0,   1,   0,   0},
-                                                                    {   0,   0,   1,   0},
-                                                                    {   0,-3.5,   0,   1}};
-
-    public static double ZOOMIN[][] = new double[][]{               { 1.1,   0,   0,   0},
-                                                                    {   0, 1.1,   0,   0},
-                                                                    {   0,   0, 1.1,   0},
                                                                     {   0,   0,   0,   1}};
 
-    public static double ZOOMOUT[][] = new double[][]{              { 0.9,   0,   0,   0},
-                                                                    {   0, 0.9,   0,   0},
-                                                                    {   0,   0, 0.9,   0},
-                                                                    {   0,   0,   0,   1}};
+    public static MyView myView;
 
-    public static double ROTATEX[][] = new double[][]{              {   1,   0,   0,   0},
-                                                                    {   0, COS, SIN,   0},
-                                                                    {   0, -SIN, COS,   0},
-                                                                    {   0,   0,   0,   1}};
-
-    public static double ROTATEY[][] = new double[][]{              { COS,   0, SIN,   0},
-                                                                    {   0,   1,   0,   0},
-                                                                    {-SIN,   0, COS,   0},
-                                                                    {   0,   0,   0,   1}};
-
-    public static double ROTATEZ[][] = new double[][]{              { COS, SIN,   0,   0},
-                                                                    {-SIN, COS,   0,   0},
-                                                                    {   0,   0,   1,   0},
-                                                                    {   0,   0,   0,   1}};
-
-    public static double SHEARLEFT[][] = new double[][]{            {   1,   0,   0,   0},
-                                                                    {-0.1,   1,   0,   0},
-                                                                    {   0,   0,   1,   0},
-                                                                    {   0,   0,   0,   1}};
-
-    public static double SHEARRIGHT[][] = new double[][]{           {   1,   0,   0,   0},
-                                                                    { 0.1,   1,   0,   0},
-                                                                    {   0,   0,   1,   0},
-                                                                    {   0,   0,   0,   1}};
-
-    static public void applyToTNet(double[][] arg){
+    static public void applyToTNet(){
         double temp[][] = new double[4][4];
         for(int i = 0 ;i<4 ; i++){
             for(int j = 0;j<4 ;j++){
-                temp[i][j] = TNet[i][0] * arg[0][j] + TNet[i][1] * arg[1][j] +
-                        TNet[i][2] * arg[2][j] + TNet[i][3] * arg[3][j];
+                temp[i][j] = TNet[i][0] * BASE[0][j] + TNet[i][1] * BASE[1][j] +
+                        TNet[i][2] * BASE[2][j] + TNet[i][3] * BASE[3][j];
             }
         }
         TNet = temp;
+    }
+
+    static public void resetBase(){
+        for(int i=0; i<BASE.length; i++) {
+            for (int j = 0; j < BASE[i].length; j++) {
+                BASE[i][j] = IDENTITY[i][j];
+            }
+        }
+    }
+
+    static public void translate(double x, double y, double z){
+        resetBase();
+        BASE[3][0] = x;
+        BASE[3][1] = y;
+        BASE[3][2] = z;
+        applyToTNet();
+    }
+
+    static public void shear(double factor){
+        resetBase();
+        BASE[1][0] = factor;
+        applyToTNet();
+    }
+
+    static public void rotate(int first, int second, double radians){
+        resetBase();
+        double cos = Math.cos(radians);
+        double sin = Math.sin(radians);
+        BASE[first][first] = cos;
+        BASE[first][second] = sin;
+        BASE[second][second] = cos;
+        BASE[second][first] = -sin;
+        applyToTNet();
+    }
+
+    static public void scale(double factor){
+        resetBase();
+        BASE[0][0] = factor;
+        BASE[1][1] = factor;
+        BASE[2][2] = factor;
+        applyToTNet();
     }
 
     static public void transform(){
@@ -96,6 +89,6 @@ public class Matrices {
             temp.add(newPoint);
         }
         MainActivity.points = temp;
-
+        myView.invalidate();
     }
 }
