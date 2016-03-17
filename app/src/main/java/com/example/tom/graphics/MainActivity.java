@@ -198,61 +198,40 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         Matrices.myView = (com.example.tom.graphics.MyView) findViewById(R.id.View);
 
-        int ok[] = new int [] {1,2};
-        int ok1[] = new int [] {2,3};
-        int ok2[] = new int [] {3,4};
-        int ok3[] = new int [] {4,1};
-        lines.add(ok);
-        lines.add(ok1);
-        lines.add(ok2);
-        lines.add(ok3);
-        double ok4[] = new double [] {5,5,0};
-        double ok5[] = new double [] {0,0,0};
-        double ok6[] = new double [] {0,10,0};
-        double ok7[] = new double [] {10,10,0};
-        double ok8[] = new double [] {10,0,0};
-        points.add(ok4);
-        points.add(ok5);
-        points.add(ok6);
-        points.add(ok7);
-        points.add(ok8);
-        initialPoints = points;
+        File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/lines.txt");
 
-        if(initialPoints == null) {
-            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/lines.txt");
-
-            try {
-                BufferedReader in = new BufferedReader(new FileReader(file));
-                while(true){
-                    int line[] = new int[2];
-                    StringTokenizer tok = new StringTokenizer(in.readLine());
-                    line[0] = Integer.parseInt(tok.nextToken());
-                    if(!tok.hasMoreTokens()){
-                        break;
-                    }
-                    line[1] = Integer.parseInt(tok.nextToken());
-                    lines.add(line);
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(file));
+            while(true){
+                int line[] = new int[2];
+                StringTokenizer tok = new StringTokenizer(in.readLine());
+                line[0] = Integer.parseInt(tok.nextToken());
+                if(!tok.hasMoreTokens()){
+                    break;
                 }
-
-                file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/points.txt");
-                in = new BufferedReader(new FileReader(file));
-                while(true){
-                    double point[] = new double[3];
-                    StringTokenizer tok = new StringTokenizer(in.readLine());
-                    point[0] = Double.parseDouble(tok.nextToken());
-                    if(!tok.hasMoreTokens()){
-                        break;
-                    }
-                    point[1] = Double.parseDouble(tok.nextToken());
-                    point[2] = Double.parseDouble(tok.nextToken());
-                    points.add(point);
-                }
-                initialPoints = points;
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                line[1] = Integer.parseInt(tok.nextToken());
+                lines.add(line);
             }
+
+            file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/points.txt");
+            in = new BufferedReader(new FileReader(file));
+            while(true){
+                double point[] = new double[3];
+                StringTokenizer tok = new StringTokenizer(in.readLine());
+                point[0] = Double.parseDouble(tok.nextToken());
+                if(!tok.hasMoreTokens()){
+                    break;
+                }
+                point[1] = Double.parseDouble(tok.nextToken());
+                point[2] = Double.parseDouble(tok.nextToken());
+                points.add(point);
+            }
+            initialPoints = points;
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
+
 }
